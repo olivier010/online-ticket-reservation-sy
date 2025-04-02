@@ -1,0 +1,201 @@
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .sidebar.dark {
+    background-color: #2d3748;
+    color: #f7fafc;
+  }
+  
+  .close-btn {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    padding: 1rem;
+    color: inherit;
+    cursor: pointer;
+  }
+  
+  .sidebar-content {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  /* Theme Toggle Section */
+  .theme-toggle-section {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1.5rem;
+  }
+  
+  .theme-toggle-section.dark {
+    border-bottom-color: #4a5568;
+  }
+  
+  .theme-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .theme-btn.active {
+    background-color: #4299e1;
+    color: white;
+    border-color: #4299e1;
+  }
+  
+  .dark .theme-btn {
+    border-color: #4a5568;
+    color: #f7fafc;
+  }
+  
+  .dark .theme-btn.active {
+    background-color: #3182ce;
+    border-color: #3182ce;
+  }
+  
+  /* Navigation Links */
+  .sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-nav li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .sidebar-nav a:hover {
+    background-color: #edf2f7;
+  }
+  
+  .sidebar-nav a.active {
+    background-color: #4299e1;
+    color: white;
+  }
+  
+  .dark .sidebar-nav a:hover {
+    background-color: #4a5568;
+  }
+  
+  .dark .sidebar-nav a.active {
+    background-color: #3182ce;
+  }
+  
+  .nav-icon {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+  }
+  
+  /* Shortcuts Section */
+  .sidebar-shortcuts {
+    margin-top: 2rem;
+  }
+  
+  .shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .shortcut-btn {
+    padding: 0.75rem;
+    background-color: #edf2f7;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  
+  .shortcut-btn:hover {
+    background-color: #e2e8f0;
+  }
+  
+  .dark .shortcut-btn {
+    background-color: #4a5568;
+    color: #f7fafc;
+  }
+  
+  .dark .shortcut-btn:hover {
+    background-color: #2d3748;
+  }
+  
+  /* Sidebar Titles */
+  .sidebar-title {
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4299e1;
+  }
+  
+  .dark .sidebar-title {
+    border-bottom-color: #4a5568;
+    color: #63b3ed;
+  }
+  
+  /* Responsive Styles */
+  @media (min-width: 992px) {
+    .sidebar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      border-right: 1px solid #e2e8f0;
+    }
+    
+    .close-btn {
+      display: none;
+    }
+    
+    .sidebar.dark {
+      border-right-color: #4a5568;
+    }
+  }
+  
+  @media (max-width: 991px) {
+    .sidebar {
+      z-index: 1001;
+    }
+    
+    .sidebar.open {
+      box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+    }
+  }
