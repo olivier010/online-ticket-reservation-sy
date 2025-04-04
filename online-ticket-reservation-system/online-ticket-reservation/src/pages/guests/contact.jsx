@@ -1,13 +1,13 @@
 import React from 'react'
 
-const login = () => {
+const contact = () => {
   return (
     <div>
       <center>
-      <h1>Login here</h1>
+        <h1>Contact Us</h1>
       </center>
     </div>
   )
 }
 
-export default login
+export default contact
