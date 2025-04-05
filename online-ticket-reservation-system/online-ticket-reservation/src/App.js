@@ -102,8 +102,7 @@ function App() {
             </Route>
 
             {/* Shared Routes */}
-            <Route path="/404" element={<PageNotFound />} />
-            <Route path="*" element={<Navigate to="/404" replace />} />
+            
           </Routes>
         </main>
         <Footer />

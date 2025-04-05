@@ -28,7 +28,7 @@ const UserNavbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   const toggleMenu = () => {

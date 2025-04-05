@@ -23,11 +23,14 @@ import { Add, Edit, Delete } from '@mui/icons-material';
 import { UserContext } from '../../contexts/UserContext';
 
 export default function ManageUsers() {
-  const { allUsers, updateUser, deleteUser, currentUser } = useContext(UserContext);
+  const { allUsers, createUser, updateUser, deleteUser, currentUser } = useContext(UserContext);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [currentEditUser, setCurrentEditUser] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleAddUser = () => {
     setCurrentEditUser({
@@ -39,36 +42,66 @@ export default function ManageUsers() {
     });
     setIsEditMode(false);
     setOpenDialog(true);
+    setError(null);
+    setSuccess(null);
   };
 
   const handleEditUser = (user) => {
     setCurrentEditUser({ ...user });
     setIsEditMode(true);
     setOpenDialog(true);
+    setError(null);
+    setSuccess(null);
   };
 
-  const handleDeleteUser = (userId) => {
+  const handleDeleteClick = (userId) => {
     if (currentUser?.id === userId) {
       setError('You cannot delete your own account while logged in');
       return;
     }
-    deleteUser(userId);
+    setUserToDelete(userId);
+    setOpenDeleteDialog(true);
   };
 
-  const handleSubmit = () => {
+  const confirmDelete = async () => {
     try {
-      if (isEditMode) {
-        // Update existing user
-        updateUser(currentEditUser.id, currentEditUser);
-      } else {
-        // Create new user - will be handled via register in context
-        const newUser = {
-          ...currentEditUser,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString()
-        };
-        updateUser(newUser.id, newUser); // Using updateUser to add new user
+      await deleteUser(userToDelete);
+      setOpenDeleteDialog(false);
+      setUserToDelete(null);
+      setSuccess('User deleted successfully');
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!currentEditUser.firstName || !currentEditUser.email || (!isEditMode && !currentEditUser.password)) {
+        throw new Error('Please fill in all required fields');
       }
+
+      if (!isEditMode) {
+        // Create new user
+        await createUser({
+          firstName: currentEditUser.firstName,
+          lastName: currentEditUser.lastName,
+          email: currentEditUser.email,
+          password: currentEditUser.password,
+          role: currentEditUser.role
+        });
+        setSuccess('User created successfully');
+      } else {
+        // Update existing user
+        await updateUser(currentEditUser.id, {
+          firstName: currentEditUser.firstName,
+          lastName: currentEditUser.lastName,
+          email: currentEditUser.email,
+          role: currentEditUser.role
+        });
+        setSuccess('User updated successfully');
+      }
+      
       setOpenDialog(false);
       setError(null);
     } catch (err) {
@@ -89,6 +122,7 @@ export default function ManageUsers() {
           variant="contained" 
           startIcon={<Add />}
           onClick={handleAddUser}
+          data-testid="add-user-button"
         >
           Add User
         </Button>
@@ -97,6 +131,12 @@ export default function ManageUsers() {
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
+        </Alert>
+      )}
+
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {success}
         </Alert>
       )}
 
@@ -130,7 +170,7 @@ export default function ManageUsers() {
                   </Tooltip>
                   <Tooltip title="Delete">
                     <IconButton 
-                      onClick={() => handleDeleteUser(user.id)}
+                      onClick={() => handleDeleteClick(user.id)}
                       disabled={currentUser?.id === user.id}
                     >
                       <Delete color={currentUser?.id === user.id ? "disabled" : "error"} />
@@ -144,7 +184,7 @@ export default function ManageUsers() {
       </TableContainer>
 
       {/* Add/Edit User Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
         <DialogTitle>
           {isEditMode ? 'Edit User' : 'Add New User'}
         </DialogTitle>
@@ -157,6 +197,7 @@ export default function ManageUsers() {
               onChange={handleChange}
               fullWidth
               required
+              margin="normal"
             />
             <TextField
               name="lastName"
@@ -164,6 +205,7 @@ export default function ManageUsers() {
               value={currentEditUser?.lastName || ''}
               onChange={handleChange}
               fullWidth
+              margin="normal"
             />
             <TextField
               name="email"
@@ -173,6 +215,7 @@ export default function ManageUsers() {
               onChange={handleChange}
               fullWidth
               required
+              margin="normal"
             />
             {!isEditMode && (
               <TextField
@@ -183,6 +226,7 @@ export default function ManageUsers() {
                 onChange={handleChange}
                 fullWidth
                 required
+                margin="normal"
                 inputProps={{ minLength: 6 }}
                 helperText="Minimum 6 characters"
               />
@@ -195,6 +239,7 @@ export default function ManageUsers() {
               onChange={handleChange}
               fullWidth
               required
+              margin="normal"
             >
               <MenuItem value="user">User</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
@@ -203,8 +248,28 @@ export default function ManageUsers() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} variant="contained">
+          <Button onClick={handleSubmit} variant="contained" color="primary">
             {isEditMode ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to delete this user? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+          <Button 
+            onClick={confirmDelete} 
+            variant="contained" 
+            color="error"
+          >
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

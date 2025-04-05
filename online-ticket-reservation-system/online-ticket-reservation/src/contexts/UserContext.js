@@ -3,40 +3,46 @@ import { createContext, useState, useEffect } from 'react';
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [usersDB, setUsersDB] = useState(() => {
-    // Initialize with admin user if no users exist
-    const defaultUsers = [{
-      id: "1",
-      firstName: "Admin",
-      lastName: "User",
-      email: "admin@example.com",
-      password: "admin123",
-      role: "admin",
-      createdAt: new Date().toISOString()
-    }];
-    
-    try {
-      const storedUsers = localStorage.getItem('usersDB');
-      return storedUsers ? JSON.parse(storedUsers) : defaultUsers;
-    } catch {
-      return defaultUsers;
-    }
-  });
+  const [usersDB, setUsersDB] = useState([]);
 
   // Initialize from localStorage
   useEffect(() => {
-    const initialize = () => {
+    const initialize = async () => {
       try {
+        // Load users database
+        const storedUsers = localStorage.getItem('usersDB');
+        const initialUsers = storedUsers ? JSON.parse(storedUsers) : [
+          {
+            id: "1",
+            firstName: "Admin",
+            lastName: "User",
+            email: "admin@example.com",
+            password: "admin123",
+            role: "admin",
+            createdAt: new Date().toISOString()
+          }
+        ];
+        setUsersDB(initialUsers);
+
+        // Load current session
         const storedUser = localStorage.getItem('currentUser');
-        const storedTheme = localStorage.getItem('darkMode');
-        
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
+          
+          // Verify user still exists in DB
+          const userExists = initialUsers.some(u => u.id === parsedUser.id);
+          if (userExists) {
+            setCurrentUser(parsedUser);
+          } else {
+            localStorage.removeItem('currentUser');
+          }
         }
+
+        // Load theme
+        const storedTheme = localStorage.getItem('darkMode');
         if (storedTheme) {
           setDarkMode(JSON.parse(storedTheme));
         }
@@ -48,92 +54,114 @@ export const UserProvider = ({ children }) => {
     };
 
     initialize();
+  }, []);
+
+  // Sync states to localStorage
+  useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  // Sync usersDB to localStorage
   useEffect(() => {
-    localStorage.setItem('usersDB', JSON.stringify(usersDB));
+    if (usersDB.length > 0) {
+      localStorage.setItem('usersDB', JSON.stringify(usersDB));
+    }
   }, [usersDB]);
 
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem('darkMode', JSON.stringify(newMode));
-    document.body.classList.toggle('dark-mode', newMode);
-  };
-
+  // Auth functions
   const authenticate = (email, password) => {
-    return usersDB.find(user => user.email === email && user.password === password);
+    return usersDB.find(user => 
+      user.email.toLowerCase() === email.toLowerCase() && 
+      user.password === password
+    );
   };
 
-  const login = (userData) => {
+  const login = async (userData) => {
     const userWithRole = {
       ...userData,
-      role: userData.role || 'user'
+      role: userData.role || 'user',
+      lastLogin: new Date().toISOString()
     };
-    setUser(userWithRole);
+    
+    setCurrentUser(userWithRole);
     localStorage.setItem('currentUser', JSON.stringify(userWithRole));
+    
+    return userWithRole;
   };
 
   const logout = () => {
-    setUser(null);
+    setCurrentUser(null);
     localStorage.removeItem('currentUser');
   };
 
-  const register = (userData) => {
-    const newUser = { 
-      ...userData, 
+  // User management functions
+  const createUser = async (userData) => {
+    const newUser = {
+      ...userData,
       id: Date.now().toString(),
-      role: 'user',
-      createdAt: new Date().toISOString()
+      role: userData.role || 'user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
-    
-    // Add to usersDB
-    setUsersDB(prev => [...prev, newUser]);
-    
-    // Auto-login the new user
-    login(newUser);
-    
+
+    const updatedUsers = [...usersDB, newUser];
+    setUsersDB(updatedUsers);
     return newUser;
   };
 
-  // Admin functions
-  const updateUser = (userId, updatedData) => {
-    setUsersDB(prev => prev.map(user => 
-      user.id === userId ? { ...user, ...updatedData } : user
-    ));
+  const updateUser = (userId, updates) => {
+    const updatedUsers = usersDB.map(user => 
+      user.id === userId ? { 
+        ...user, 
+        ...updates,
+        updatedAt: new Date().toISOString() 
+      } : user
+    );
+    
+    setUsersDB(updatedUsers);
+
+    // Update current user if it's them
+    if (currentUser?.id === userId) {
+      const updatedCurrentUser = updatedUsers.find(u => u.id === userId);
+      setCurrentUser(updatedCurrentUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+    }
   };
 
   const deleteUser = (userId) => {
-    setUsersDB(prev => prev.filter(user => user.id !== userId));
-    if (user?.id === userId) logout(); // Logout if current user is deleted
+    const updatedUsers = usersDB.filter(user => user.id !== userId);
+    setUsersDB(updatedUsers);
+    
+    if (currentUser?.id === userId) {
+      logout();
+    }
   };
 
   const contextValue = {
-    // State values
-    currentUser: user,
+    // State
+    currentUser,
     darkMode,
     isLoading,
-    allUsers: usersDB, // For admin panel
+    allUsers: usersDB,
     
-    // Role checkers
-    isGuest: !user,
-    isUser: user?.role === 'user',
-    isAdmin: user?.role === 'admin',
+    // Role checks
+    isGuest: !currentUser,
+    isUser: currentUser?.role === 'user',
+    isAdmin: currentUser?.role === 'admin',
     
     // Auth functions
     authenticate,
     login,
     logout,
-    register,
+    register: createUser, // Alias for createUser
     
-    // User management (admin only)
+    // User management
+    createUser,
     updateUser,
     deleteUser,
     
-    // Theme functions
-    toggleDarkMode,
+    // Theme
+    toggleDarkMode: () => setDarkMode(prev => !prev),
     setDarkMode
   };
 

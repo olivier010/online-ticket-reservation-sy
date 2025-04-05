@@ -1,15 +1,25 @@
 import { TextField, Button, Box, Typography, Alert, CircularProgress, Link } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, authenticate } = useContext(UserContext); // Using context's authenticate
+  const location = useLocation();
+  const { login, authenticate, isLoading, currentUser } = useContext(UserContext);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Redirect if already logged in (on mount and when user changes)
+  useEffect(() => {
+    if (currentUser && !isLoading) {
+      const from = location.state?.from?.pathname || 
+                 (currentUser.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+     navigate(from, { replace: true });
+    }
+  }, [currentUser, isLoading, navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,20 +35,17 @@ export default function Login() {
         throw new Error('Please enter a valid email address');
       }
 
-      const user = authenticate(email, password);
+      const user = await authenticate(email, password);
       
       if (!user) {
         throw new Error('Invalid email or password');
       }
 
-      login(user);
+      await login(user);
       
-      // Redirect based on role
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
+      // The useEffect will handle the redirect when currentUser updates
+      // So we don't need to navigate here anymore
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -46,8 +53,29 @@ export default function Login() {
     }
   };
 
+  // Show loading spinner if checking auth state or after successful login before redirect
+  if (isLoading || (isSubmitting && !error)) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '100vh'
+      }}>
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
+    <Box sx={{ 
+      maxWidth: 400, 
+      mx: 'auto', 
+      mt: 4,
+      p: 3,
+      boxShadow: 3,
+      borderRadius: 2
+    }}>
       <Typography variant="h4" component="h1" gutterBottom align="center">
         Welcome Back
       </Typography>
@@ -70,6 +98,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value.trim())}
           autoComplete="email"
+          autoFocus
         />
         
         <TextField

@@ -5,7 +5,7 @@ import { UserContext } from '../../contexts/UserContext';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register, allUsers } = useContext(UserContext);
+  const { register, login, allUsers } = useContext(UserContext);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -17,37 +17,42 @@ export default function Register() {
     try {
       const data = new FormData(e.target);
       const email = data.get('email').trim().toLowerCase();
-      const userData = {
-        firstName: data.get('firstName').trim(),
-        lastName: data.get('lastName').trim(),
-        email,
-        password: data.get('password'),
-      };
+      const password = data.get('password');
+      const firstName = data.get('firstName').trim();
+      const lastName = data.get('lastName').trim();
 
       // Validation
-      if (!userData.firstName || !userData.email || !userData.password) {
+      if (!firstName || !email || !password) {
         throw new Error('Please fill in all required fields');
       }
 
-      if (userData.password.length < 6) {
+      if (password.length < 6) {
         throw new Error('Password must be at least 6 characters');
       }
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error('Please enter a valid email address');
       }
 
-      // Check if email already exists
-      const emailExists = allUsers.some(user => user.email.toLowerCase() === email);
-      if (emailExists) {
+      // Check for existing email
+      if (allUsers.some(user => user.email.toLowerCase() === email)) {
         throw new Error('Email already registered');
       }
 
-      // Register user
-      await register(userData);
+      // Register and auto-login
+      const newUser = await register({
+        firstName,
+        lastName,
+        email,
+        password // Note: Hash this in production
+      });
+
+      // Login the newly registered user
+      login(newUser);
       
-      // Redirect to login
-      navigate('/guests/login');
+      // Redirect to user dashboard
+      navigate('/user/dashboard');
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -101,14 +106,22 @@ export default function Register() {
           margin="normal"
           required
           disabled={isSubmitting}
-          inputProps={{ minLength: 6, maxLength: 100 }}
+          inputProps={{ 
+            minLength: 6, 
+            maxLength: 100,
+            'data-testid': 'password-input' 
+          }}
           helperText="Minimum 6 characters"
         />
         <Button
           type="submit"
           variant="contained"
           size="large"
-          sx={{ mt: 3 }}
+          sx={{ 
+            mt: 3,
+            py: 1.5,
+            fontSize: '1rem'
+          }}
           disabled={isSubmitting}
           fullWidth
         >
