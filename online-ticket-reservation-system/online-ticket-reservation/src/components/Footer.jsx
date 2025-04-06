@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import { UserContext } from '../contexts/UserContext';
+import React from 'react';
 import { 
   Email, 
   Phone, 
@@ -17,10 +16,9 @@ import {
 import './Footer.css';
 
 const Footer = () => {
-  const { darkMode } = useContext(UserContext);
 
   return (
-    <footer className={`footer ${darkMode ? 'dark-mode' : ''}`}>
+    <footer className="footer">
       <div className="footer-container">
         {/* Quick Links */}
         <div className="footer-section">

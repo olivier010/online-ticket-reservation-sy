@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserContext } from '../../contexts/UserContext';
 import { 
   Dashboard as DashboardIcon,
   People,
@@ -15,15 +14,9 @@ import {
 } from '@mui/icons-material';
 import './Navbar.css';
 
-const AdminNavbar = () => {
-  const { user, darkMode, toggleDarkMode, logout } = useContext(UserContext);
+const AdminNavbar = ({ darkMode, toggleDarkMode, role }) => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -33,9 +26,9 @@ const AdminNavbar = () => {
     <header className={`navbar admin ${darkMode ? 'dark' : ''}`}>
       <div className="navbar-container">
         <div className="navbar-brand">
-          <Link to="/admin" className="logo-link">
+          <Link to="/" className="logo-link">
             <div className="logo">OTRS</div>
-            <h1>Admin Panel</h1>
+            <h1>{role === 'admin' ? 'Admin Panel' : 'User Panel'}</h1>
           </Link>
           <button className="menu-toggle" onClick={toggleMenu}>
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -44,10 +37,20 @@ const AdminNavbar = () => {
 
         <nav className={`desktop-nav ${menuOpen ? 'open' : ''}`}>
           <ul className="nav-links">
-            <li><Link to="/admin"><DashboardIcon /> Dashboard</Link></li>
-            <li><Link to="/admin/users"><People /> Manage Users</Link></li>
-            <li><Link to="/admin/tickets"><ConfirmationNumber /> Manage Tickets</Link></li>
-            <li><Link to="/admin/analytics"><BarChart /> Analytics</Link></li>
+            {role === 'admin' ? (
+              <>
+                <li><Link to="/admin"><DashboardIcon /> Dashboard</Link></li>
+                <li><Link to="/admin/users"><People /> Manage Users</Link></li>
+                <li><Link to="/admin/tickets"><ConfirmationNumber /> Manage Tickets</Link></li>
+                <li><Link to="/admin/analytics"><BarChart /> Analytics</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link to="/user/dashboard"><DashboardIcon /> Dashboard</Link></li>
+                <li><Link to="/user/tickets"><ConfirmationNumber /> My Tickets</Link></li>
+                <li><Link to="/user/profile"><AccountCircle /> Profile</Link></li>
+              </>
+            )}
           </ul>
         </nav>
 
@@ -57,9 +60,9 @@ const AdminNavbar = () => {
           </button>
           <div className="admin-profile">
             <AccountCircle />
-            <span>{user?.name}</span>
+            <span>{role === 'admin' ? 'Admin' : 'User'}</span>
           </div>
-          <button className="logout-button" onClick={handleLogout}>
+          <button className="logout-button" onClick={() => navigate('/')}>
             <Logout /> Logout
           </button>
         </div>
