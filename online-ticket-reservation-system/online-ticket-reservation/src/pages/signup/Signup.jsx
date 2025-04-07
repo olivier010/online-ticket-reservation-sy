@@ -79,11 +79,19 @@ const Signup = () => {
             return;
         }
 
-        setError('');
         const users = JSON.parse(localStorage.getItem('users')) || [];
-        users.push({ name, email, password, role });
+        const existingUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+
+        if (existingUser) {
+            setError('An account with this email already exists.');
+            return;
+        }
+
+        setError('');
+        users.push({ name, email: email.toLowerCase(), password, role: role.toLowerCase() }); // Store role in lowercase
         localStorage.setItem('users', JSON.stringify(users)); // Store user credentials
         navigate('/login'); // Ensure '/login' route exists
+        console.log('User registered:', { name, email, password, role });
     };
 
     return (
@@ -135,8 +143,7 @@ const Signup = () => {
                     >
                         <option value="">Select Role</option>
                         <option value="Admin">Admin</option>
-                        <option value="Parent">Parent</option>
-                        <option value="Caregiver">Caregiver</option>
+                        <option value="User">User</option>
                     </select>
                 </div>
                 {error && <p className="error">{error}</p>}
