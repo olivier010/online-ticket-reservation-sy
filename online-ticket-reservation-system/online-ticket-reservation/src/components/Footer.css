@@ -33,17 +33,10 @@
     position: relative;
     padding-bottom: 0.5rem;
     
+    
   }
   
-  .footer-section h3::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 50px;
-    height: 2px;
-    background-color: #e74c3c;
-  }
+ 
   
   .footer-links {
     list-style: none;

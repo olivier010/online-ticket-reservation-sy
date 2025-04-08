@@ -38,7 +38,7 @@ const AdminNavbar = ({ role }) => {
           <div className="navbar-brand">
             <Link to="/" className="logo-link">
               <div className="logo">OTRS</div>
-              <h1>{role === 'admin' ? 'Admin Panel' : 'User Panel'}</h1>
+              <h1>Admin Pannel</h1>
             </Link>
             <button className="menu-toggle" onClick={toggleMenu}>
               {menuOpen ? <CloseIcon /> : <MenuIcon />}

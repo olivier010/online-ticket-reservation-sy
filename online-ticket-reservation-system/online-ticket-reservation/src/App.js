@@ -6,8 +6,9 @@ import Footer from './components/Footer';
 import Login from './pages/login/Login';
 import Signup from './pages/signup/Signup';
 import UserDashboard from './pages/user/UserDashboard';
-import TicketTable from './pages/admin/TicketTable';
+
 import ManageTickets from './pages/admin/ManageTickets';
+import ManageUser from './pages/admin/ManageUser';
 import Dashboard from './pages/admin/Dashboard';
 import Analytics from './pages/admin/Analytics';
 import Booking from './pages/user/Booking';
@@ -56,7 +57,8 @@ function App() {
             path="/ManageTickets"
             element={<ManageTickets tickets={tickets} setTickets={saveTickets} />}
           />
-          <Route path="/TicketTable" element={<TicketTable />} />
+          <Route path='/ManageUser' element={<ManageUser />} />
+         
           <Route path="/Analytics" element={<Analytics />} />
 
           {/* User Routes */}

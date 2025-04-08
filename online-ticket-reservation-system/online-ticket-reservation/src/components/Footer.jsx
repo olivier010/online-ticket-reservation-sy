@@ -41,11 +41,11 @@ const Footer = () => {
             </div>
             <div className="contact-item">
               <Phone />
-              <span>+1 (123) 456-7890</span>
+              <span>+250 456-7890</span>
             </div>
             <div className="contact-item">
               <LocationOn />
-              <span>123 Theater St, City, Country</span>
+              <span>12 kigali, City, Country</span>
             </div>
           </div>
         </div>
@@ -54,10 +54,10 @@ const Footer = () => {
         <div className="footer-section">
           <h3>Follow Us</h3>
           <div className="social-links">
-            <a href="#" className="social-link"><Facebook /></a>
-            <a href="#" className="social-link"><Twitter /></a>
-            <a href="#" className="social-link"><Instagram /></a>
-            <a href="#" className="social-link"><LinkedIn /></a>
+            <a href="https://www.facebook.com/" className="social-link"><Facebook /></a>
+            <a href="https://www.instagram.com/" className="social-link"><Twitter /></a>
+            <a href="https://x.com/twitter?lang=en" className="social-link"><Instagram /></a>
+            <a href="https://www.linkedin.com/" className="social-link"><LinkedIn /></a>
           </div>
         </div>
       </div>

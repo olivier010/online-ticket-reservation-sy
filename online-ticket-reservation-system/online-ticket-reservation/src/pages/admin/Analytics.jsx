@@ -86,7 +86,7 @@ const Analytics = () => {
         </Grid>
 
         {/* Ticket Resolution Times */}
-        <Grid item xs={12}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ padding: 2 }}>
             <Typography variant="h6" gutterBottom>
               Ticket Resolution Times

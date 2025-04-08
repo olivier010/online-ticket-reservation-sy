@@ -38,19 +38,19 @@ const Dashboard = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={4}>
               <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                <Typography variant="h5">30</Typography>
+                <Typography variant="h5">20</Typography>
                 <Typography variant="body1">Total Tickets</Typography>
               </Paper>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                <Typography variant="h5">20</Typography>
+                <Typography variant="h5">10</Typography>
                 <Typography variant="body1">Active Users</Typography>
               </Paper>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
-                <Typography variant="h5">5</Typography>
+                <Typography variant="h5">10</Typography>
                 <Typography variant="body1">Pending Approvals</Typography>
               </Paper>
             </Grid>
