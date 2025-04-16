@@ -31,80 +31,80 @@ const Analytics = () => {
 
   return (
     <>
-    <AdminNav />
-    <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        System Analytics
-      </Typography>
+      <AdminNav />
+      <Box sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography variant="h4" gutterBottom>
+          System Analytics
+        </Typography>
 
-      <Grid container spacing={4}>
-        {/* Ticket Status Distribution */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Ticket Status Distribution
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={ticketData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                >
-                  {ticketData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+        <Grid container spacing={4} justifyContent="center" alignItems="center">
+          {/* Ticket Status Distribution */}
+          <Grid item xs={12} md={6} lg={4}>
+            <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+              <Typography variant="h6" gutterBottom>
+                Ticket Status Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={ticketData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {ticketData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
 
-        {/* User Growth */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              User Growth
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={userData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="users" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Paper>
-        </Grid>
+          {/* User Growth */}
+          <Grid item xs={12} md={6} lg={4}>
+            <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+              <Typography variant="h6" gutterBottom>
+                User Growth
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={userData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="users" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
 
-        {/* Ticket Resolution Times */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ padding: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Ticket Resolution Times
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={resolutionTimes}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="time" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-          </Paper>
+          {/* Ticket Resolution Times */}
+          <Grid item xs={12} md={6} lg={4}>
+            <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+              <Typography variant="h6" gutterBottom>
+                Ticket Resolution Times
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={resolutionTimes}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="time" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
     </>
   );
 };

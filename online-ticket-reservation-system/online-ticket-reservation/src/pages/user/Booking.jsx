@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import UserNav from '../../components/navbar/UserNav';
 
 function Booking({ tickets }) {
   const [filterText, setFilterText] = useState('');
+  const [selectedTicket, setSelectedTicket] = useState(null); // State for selected ticket
+  const [viewDialogOpen, setViewDialogOpen] = useState(false); // State for view dialog
 
   const handleBuyTicket = (ticketId) => {
     const purchasedTicket = tickets.find((ticket) => ticket.id === ticketId);
@@ -13,6 +15,16 @@ function Booking({ tickets }) {
       localStorage.setItem('purchasedTickets', JSON.stringify([...purchasedTickets, purchasedTicket]));
       alert(`Ticket with ID ${ticketId} has been purchased!`);
     }
+  };
+
+  const handleViewTicket = (ticket) => {
+    setSelectedTicket(ticket);
+    setViewDialogOpen(true);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedTicket(null);
   };
 
   // Filter tickets to show only "Open" tickets
@@ -25,22 +37,34 @@ function Booking({ tickets }) {
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'email', headerName: 'Email', width: 250 },
+    { field: 'name', headerName: 'Event Name', width: 200 },
+    { field: 'email', headerName: 'Event Location', width: 250 },
     { field: 'price', headerName: 'Price', width: 150 },
+    { field: 'time', headerName: 'Event Time', width: 200 },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 250,
       renderCell: (params) => (
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => handleBuyTicket(params.row.id)}
-        >
-          Buy
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => handleBuyTicket(params.row.id)}
+            style={{ marginRight: 8 }}
+          >
+            Buy
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            size="small"
+            onClick={() => handleViewTicket(params.row)}
+          >
+            View
+          </Button>
+        </>
       ),
     },
   ];
@@ -72,6 +96,28 @@ function Booking({ tickets }) {
           </div>
         </Box>
       </Box>
+
+      {/* View Ticket Dialog */}
+      <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog}>
+        <DialogTitle>Ticket Details</DialogTitle>
+        <DialogContent>
+          {selectedTicket && (
+            <DialogContentText>
+              <strong>ID:</strong> {selectedTicket.id} <br />
+              <strong>Name:</strong> {selectedTicket.name} <br />
+              <strong>Location:</strong> {selectedTicket.email} <br />
+              <strong>Price:</strong> {selectedTicket.price} <br />
+              <strong>Event Time:</strong> {selectedTicket.time || 'Not Set'} <br />
+              <strong>Status:</strong> {selectedTicket.status}
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

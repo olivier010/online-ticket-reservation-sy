@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import UserNav from '../../components/navbar/UserNav';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
@@ -7,15 +7,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 function Tickets() {
   const [purchasedTickets, setPurchasedTickets] = useState([]);
   const [histogramData, setHistogramData] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null); // State for selected ticket
+  const [viewDialogOpen, setViewDialogOpen] = useState(false); // State for view dialog
 
   useEffect(() => {
     const tickets = JSON.parse(localStorage.getItem('purchasedTickets')) || [];
-    // Ensure dates are properly validated and formatted to display only the date
+    // Ensure the `date` field from the booking page is used
     const formattedTickets = tickets.map(ticket => ({
       ...ticket,
-      date: ticket.date && !isNaN(new Date(ticket.date)) 
-        ? new Date(ticket.date).toLocaleDateString() // Display only the date
-        : new Date().toLocaleDateString(), // Use current PC date if invalid
+      date: ticket.date || 'Unknown Date', // Use the date from the booking page or fallback
     }));
     setPurchasedTickets(formattedTickets);
 
@@ -38,25 +38,46 @@ function Tickets() {
     localStorage.setItem('purchasedTickets', JSON.stringify(updatedTickets));
   };
 
+  const handleViewTicket = (ticket) => {
+    setSelectedTicket(ticket);
+    setViewDialogOpen(true);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedTicket(null);
+  };
+
   const columns = [
     { field: 'id', headerName: 'ID', width: 100 },
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'email', headerName: 'Email', width: 250 },
     { field: 'price', headerName: 'Price', width: 150 },
-    { field: 'date', headerName: 'Date', width: 150 },
+    { field: 'date', headerName: 'Date', width: 150 }, // Display the date from the booking page
     {
       field: 'action',
       headerName: 'Action',
-      width: 150,
+      width: 250,
       renderCell: (params) => (
-        <Button 
-          variant="contained" 
-          color="error" 
-          size="small" 
-          onClick={() => handleDelete(params.row.id)}
-        >
-          Delete
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="info"
+            size="small"
+            onClick={() => handleViewTicket(params.row)}
+            style={{ marginRight: 8 }}
+          >
+            View
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </Button>
+        </>
       ),
     },
   ];
@@ -103,6 +124,28 @@ function Tickets() {
           )}
         </Box>
       </Box>
+
+      {/* View Ticket Dialog */}
+      <Dialog open={viewDialogOpen} onClose={handleCloseViewDialog}>
+        <DialogTitle>Ticket Details</DialogTitle>
+        <DialogContent>
+          {selectedTicket && (
+            <DialogContentText>
+              <strong>ID:</strong> {selectedTicket.id} <br />
+              <strong>Name:</strong> {selectedTicket.name} <br />
+              <strong>Email:</strong> {selectedTicket.email} <br />
+              <strong>Price:</strong> {selectedTicket.price} <br />
+              <strong>Date:</strong> {selectedTicket.date} <br />
+              <strong>Status:</strong> {selectedTicket.status}
+            </DialogContentText>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

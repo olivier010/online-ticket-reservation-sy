@@ -48,7 +48,7 @@ const AdminNavbar = ({ role }) => {
           <nav className={`desktop-nav ${menuOpen ? 'open' : ''}`}>
             <ul className="nav-links">
               <li><Link to="/Dashboard"><DashboardIcon /> Dashboard</Link></li>
-              <li><Link to="/ManageUsers"><People /> Manage Users</Link></li>
+              <li><Link to="/ManageUser"><People /> Manage Users</Link></li>
               <li><Link to="/ManageTickets"><ConfirmationNumber /> Manage Tickets</Link></li>
               <li><Link to="/Analytics"><Analytics /> Analytics</Link></li>
             </ul>

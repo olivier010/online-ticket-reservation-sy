@@ -9,12 +9,12 @@ function ManageTickets({ tickets, setTickets }) {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [bookDialogOpen, setBookDialogOpen] = useState(false); // State for booking dialog
-  const [editDialogOpen, setEditDialogOpen] = useState(false); // State for edit dialog
-  const [editTicket, setEditTicket] = useState(null); // State for the ticket being edited
+  const [bookDialogOpen, setBookDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTicket, setEditTicket] = useState(null);
   const [filterText, setFilterText] = useState('');
-  const [newTicket, setNewTicket] = useState({ name: '', email: '', status: '', price: '' }); // Added price field
-  const [bookingDetails, setBookingDetails] = useState({ name: '', email: '' }); // State for booking form
+  const [newTicket, setNewTicket] = useState({ name: '', email: '', status: '', price: '', time: '' }); // Added time field
+  const [bookingDetails, setBookingDetails] = useState({ name: '', email: '' });
 
   const handleView = (ticket) => {
     setSelectedTicket(ticket);
@@ -26,17 +26,17 @@ function ManageTickets({ tickets, setTickets }) {
   };
 
   const confirmDelete = () => {
-    setTickets(tickets.filter((ticket) => ticket.id !== selectedTicket)); // Update tickets via setTickets
+    setTickets(tickets.filter((ticket) => ticket.id !== selectedTicket));
     setDeleteDialogOpen(false);
     setSelectedTicket(null);
   };
 
   const handleAdd = () => {
-    const newId = tickets.length > 0 ? Math.max(...tickets.map((t) => t.id)) + 1 : 1; // Generate a new ID
+    const newId = tickets.length > 0 ? Math.max(...tickets.map((t) => t.id)) + 1 : 1;
     const ticketToAdd = { id: newId, ...newTicket };
-    setTickets([...tickets, ticketToAdd]); // Update tickets via setTickets
+    setTickets([...tickets, ticketToAdd]);
     setAddDialogOpen(false);
-    setNewTicket({ name: '', email: '', status: '', price: '' }); // Reset form
+    setNewTicket({ name: '', email: '', status: '', price: '', time: '' });
   };
 
   const handleBook = () => {
@@ -64,7 +64,7 @@ function ManageTickets({ tickets, setTickets }) {
   const handleApproveTicket = (ticketId) => {
     setTickets(
       tickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, status: 'Open' } : ticket // Change status to "Open"
+        ticket.id === ticketId ? { ...ticket, status: 'Open' } : ticket
       )
     );
   };
@@ -93,10 +93,11 @@ function ManageTickets({ tickets, setTickets }) {
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 100, sortable: true },
-    { field: 'name', headerName: 'Name', width: 200, sortable: true },
-    { field: 'email', headerName: 'Email', width: 250, sortable: true },
+    { field: 'name', headerName: 'Event Name', width: 200, sortable: true },
+    { field: 'email', headerName: 'Event Location', width: 250, sortable: true },
     { field: 'status', headerName: 'Status', width: 150, sortable: true },
-    { field: 'price', headerName: 'Price', width: 150, sortable: true }, // Added price column
+    { field: 'price', headerName: 'Price', width: 150, sortable: true },
+    { field: 'time', headerName: 'Event Time', width: 200, sortable: true }, // Added time column
     {
       field: 'actions',
       headerName: 'Actions',
@@ -206,7 +207,7 @@ function ManageTickets({ tickets, setTickets }) {
       </Box>
 
       {/* Analytics Section */}
-      <Box sx={{ padding: 4,marginTop: 4 }}>
+      <Box sx={{ padding: 4, marginTop: 4 }}>
         <Typography variant="h6" gutterBottom>
           Ticket Booking Analytics
         </Typography>
@@ -225,14 +226,14 @@ function ManageTickets({ tickets, setTickets }) {
         <DialogTitle>Add New Ticket</DialogTitle>
         <DialogContent>
           <TextField
-            label="Name"
+            label="Event Name"
             fullWidth
             margin="normal"
             value={newTicket.name}
             onChange={(e) => setNewTicket({ ...newTicket, name: e.target.value })}
           />
           <TextField
-            label="Email"
+            label="Event Location"
             fullWidth
             margin="normal"
             value={newTicket.email}
@@ -250,7 +251,7 @@ function ManageTickets({ tickets, setTickets }) {
             }}
           >
             <option value="" disabled>
-             Status
+              Status
             </option>
             <option value="Open">Open</option>
             <option value="Closed">Closed</option>
@@ -263,6 +264,17 @@ function ManageTickets({ tickets, setTickets }) {
             margin="normal"
             value={newTicket.price}
             onChange={(e) => setNewTicket({ ...newTicket, price: e.target.value })}
+          />
+          <TextField
+            label="Event Time"
+            type="datetime-local"
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={newTicket.time}
+            onChange={(e) => setNewTicket({ ...newTicket, time: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
@@ -325,6 +337,19 @@ function ManageTickets({ tickets, setTickets }) {
             value={editTicket?.price || ''}
             onChange={(e) =>
               setEditTicket({ ...editTicket, price: e.target.value })
+            }
+          />
+          <TextField
+            label="Event Time"
+            type="datetime-local"
+            fullWidth
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={editTicket?.time || ''}
+            onChange={(e) =>
+              setEditTicket({ ...editTicket, time: e.target.value })
             }
           />
         </DialogContent>
@@ -394,7 +419,9 @@ function ManageTickets({ tickets, setTickets }) {
               <strong>ID:</strong> {selectedTicket.id} <br />
               <strong>Name:</strong> {selectedTicket.name} <br />
               <strong>Email:</strong> {selectedTicket.email} <br />
-              <strong>Status:</strong> {selectedTicket.status}
+              <strong>Status:</strong> {selectedTicket.status} <br />
+              <strong>Price:</strong> {selectedTicket.price} <br />
+              <strong>Event Time:</strong> {selectedTicket.time || 'Not Set'} <br />
             </DialogContentText>
           </DialogContent>
           <DialogActions>
